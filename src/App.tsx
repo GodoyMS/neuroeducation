@@ -1,5 +1,5 @@
 import { Component, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
-import { Canvas, type GroupProps } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import {
   Environment,
   GizmoHelper,
@@ -54,7 +54,13 @@ class CanvasErrorBoundary extends Component<
   }
 }
 
-function SceneModel(props: GroupProps) {
+type SceneModelProps = {
+  position?: [number, number, number]
+  rotation?: [number, number, number]
+  scale?: number | [number, number, number]
+}
+
+function SceneModel(props: SceneModelProps) {
   const { scene } = useGLTF(MODEL_URL)
 
   return <primitive object={scene} {...props} />
@@ -116,7 +122,7 @@ async function verifyModelAssets(modelUrl: string): Promise<AssetCheckState> {
   const referencedUris = [
     ...(gltfJson.buffers ?? []).map((entry) => entry.uri),
     ...(gltfJson.images ?? []).map((entry) => entry.uri),
-  ].filter((uri): uri is string => Boolean(uri) && !uri.startsWith('data:'))
+  ].filter((uri): uri is string => typeof uri === 'string' && !uri.startsWith('data:'))
 
   const missing: string[] = []
   for (const uri of referencedUris) {
